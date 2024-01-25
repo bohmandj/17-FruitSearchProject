@@ -6,12 +6,18 @@ const fruit = ['Apple', 'Apricot', 'Avocado 🥑', 'Banana', 'Bilberry', 'Blackb
 function search(str) {
 	let results = [];
 	// loop over fruit array for case-safe input match, add matches to results
-	for (let item of fruit) {
-		if (item.toLowerCase().includes(str.toLowerCase())) {
-			results.push(item);
-		}
-	}
+	results = fruit.filter(item => item.toLowerCase().includes(str.toLowerCase()));
 	return results;
+}
+
+function debounce(fn, time) {
+	let timer;
+	return function () {
+		clearTimeout(timer);
+		timer = setTimeout(() => {
+			fn.apply(this, arguments)
+		}, time)
+	}
 }
 
 function searchHandler(e) {
@@ -25,9 +31,7 @@ function searchHandler(e) {
 
 function clearUl() {
 	// remove ul css and old li list if there is one
-	while (suggestions.firstChild) {
-		suggestions.removeChild(suggestions.lastChild);
-	}
+	suggestions.replaceChildren();
 	suggestions.classList.remove("has-suggestions");
 }
 
@@ -49,9 +53,9 @@ function showSuggestions(matchesArr, inputVal) {
 
 function useSuggestion(e) {
 	// replace current input value with picked fruit and clear ul
-	input.value = e.target.innerText
+	input.value = e.target.parentNode.innerText
 	clearUl();
 }
 
-input.addEventListener('keyup', searchHandler);
+input.addEventListener('keyup', debounce(searchHandler, "150"));
 suggestions.addEventListener('click', useSuggestion);
